@@ -2,6 +2,8 @@ from customtkinter import *
 from PIL import Image, ImageTk
 
 import openpyxl
+from tkinter import ttk
+import pandas as pd
 
 
 #cores
@@ -50,7 +52,27 @@ class Janela:
         self.saldoSaidas = despesa
 
 
+    def load_excel(self):
+        # Carregar o Excel e inverter a ordem das linhas
+        self.df = pd.read_excel(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx").fillna("")
+        self.df = self.df.iloc[::-1]  # Inverte a ordem das linhas
+        self.df = self.df.iloc[:, :7]  # Seleciona apenas as colunas A a G (primeiras 7 colunas)
 
+    def update_table(self):
+        self.load_excel()
+        self.tree.delete(*self.tree.get_children())
+        
+        self.tree["column"] = list(self.df.columns)
+        
+        for i, column in enumerate(self.tree["column"]):
+            self.tree.heading(column, text=column)
+            if i == 6 or 5 or 4:  # Verifica se é a coluna 7 (índice 6)
+                self.tree.column(column, minwidth=50, width=50, stretch=True)  # Define uma largura maior
+            else:
+                self.tree.column(column, minwidth=30, width=30, stretch=True)
+        
+        for row in self.df.to_numpy().tolist():
+            self.tree.insert("", "end", values=row)
 
         
     def homepage(self):
@@ -58,6 +80,36 @@ class Janela:
         self.obter_saldo()
         self.janela.geometry("1024x720")
         self.janela.configure(fg_color=fundo)
+        
+        #frame central---------------------
+        self.posxframecentral = 280
+        
+        self.framecentro = CTkFrame(master=self.janela,width=710,height=460,fg_color=fundo_cima,corner_radius=30)
+        self.framecentro.place(x=self.posxframecentral,y=160)
+        
+
+        # Configuração do estilo do ttk para combinar com CustomTkinter
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure("Treeview",
+                        background="#D3D3D3",
+                        foreground="black",
+                        rowheight=25,
+                        fieldbackground="#D3D3D3")
+        style.map('Treeview',
+                  background=[('selected', '#347083')])
+
+        # Criação do Treeview
+        self.tree = ttk.Treeview(self.framecentro, show="headings", height=5)
+        self.tree.place(x=40,y=290)
+        
+        
+        self.load_excel()
+        self.update_table()  
+        
+        
+        
+        
         
         
         
@@ -92,11 +144,7 @@ class Janela:
         
         
         
-        #frame central---------------------
-        self.posxframecentral = 280
-        
-        self.framecentro = CTkFrame(master=self.janela,width=710,height=460,fg_color=fundo_cima,corner_radius=30)
-        self.framecentro.place(x=self.posxframecentral,y=160)
+
         
         
         CTkLabel(master=self.framecentro,text=self.saldo,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=100)
@@ -104,6 +152,9 @@ class Janela:
         CTkLabel(master=self.framecentro,text=self.saldoSaidas,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=200)
         
         CTkButton(master=self.janela,height=60,corner_radius=30,text="Sair",command=self.janela.destroy).place(x=840,y=640)
+        
+        
+
         
         
         #decoração frame central

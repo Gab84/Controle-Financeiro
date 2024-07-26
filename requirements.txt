@@ -1,4 +1,6 @@
 openpyxl
 customtkinter
-PIL
+pillow
 xlwings
+pandas
+tkinter

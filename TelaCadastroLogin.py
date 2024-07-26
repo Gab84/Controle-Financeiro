@@ -84,9 +84,8 @@ class Janela:
         ws["J1"] = "Saldo"
         # Fórmula para calcular o saldo conforme "Entrada" e "Saída"
         ws["J2"] = "=I2 + SUMIF(G2:G100000, \"Entrada\", F2:F100000) - SUMIF(G2:G100000, \"Saida\", F2:F100000)"
-        
         # Salva o arquivo
-        wb.save(f"anotacoes/{self.nusuariox}_controle_financeiro.xlsx")
+        wb.save(f"./planilha_anotacoes/{self.nusuariox}_controle_financeiro.xlsx")
 
     def cadastrar_usuario(self):
         self.nusuariox = self.nusuario.get()
@@ -106,29 +105,29 @@ class Janela:
         self.janela._set_appearance_mode("dark")
         self.janela.resizable(False,False)
         self.janela.title("Tela Inicial")
-        self.janela.iconbitmap("icons\icons8-casa-48.ico")
+        self.janela.iconbitmap("./icons/icons8-casa-48.ico")
         self.janela.configure(fg_color="#F2F2F2",bg_color="transparent")
         
         self.frameEscolha = CTkFrame(master=self.janela,width=500,height=320,fg_color="#1A1926",corner_radius=20,)
-        self.homeImage = CTkImage(light_image=Image.open("images\homeImage.png"),dark_image=Image.open("images\homeImage.png"),size=(280,300))
+        self.homeImage = CTkImage(light_image=Image.open("./imgassets/cadastro/homeImage.png"),dark_image=Image.open("./imgassets/cadastro/homeImage.png"),size=(280,300))
         self.lbHomeImage = CTkLabel(master=self.frameEscolha,image=self.homeImage,text=None)
         self.lbHomeImage.place(x=10,y=15)
         
-        self.cadastroImage = "Bottoes Img\iregistroImg.png"
-        self.cadastroImagehover = "Bottoes Img\hover_img\hover_cadastro.png"
+        self.cadastroImage = "./Bottoes Img/iregistroImg.png"
+        self.cadastroImagehover = "./Bottoes Img/hover_img/hover_cadastro.png"
 
-        self.loginImage = "Bottoes Img\loginImg.png"
-        self.loginImagehover = "Bottoes Img\hover_img\hover_login.png"
+        self.loginImage = "./Bottoes Img/loginImg.png"
+        self.loginImagehover = "./Bottoes Img/hover_img/hover_login.png"
         
         
-        self.voltImage = "Bottoes Img\homeImg.png"
-        self.voltImagehove = "Bottoes Img\hover_img\hover_home.png"
+        self.voltImage = "./Bottoes Img/homeImg.png"
+        self.voltImagehove = "./Bottoes Img/hover_img/hover_home.png"
         
-        self.Imgentrar = "Bottoes Img\ImgEntrar.png"
-        self.Imgentrarhover = "Bottoes Img\hover_img\ImgEntrarhover.png"
+        self.Imgentrar = "./Bottoes Img/ImgEntrar.png"
+        self.Imgentrarhover = "./Bottoes Img/hover_img/ImgEntrarhover.png"
 
-        self.ImgRegistro = "Bottoes Img\Imgregistro.png"
-        self.ImgRegistrohover = "Bottoes Img\hover_img\Imgregistrohover.png"
+        self.ImgRegistro = "./Bottoes Img/Imgregistro.png"
+        self.ImgRegistrohover = "./Bottoes Img/hover_img/Imgregistrohover.png"
         
         ImageHoverButton(master=self.frameEscolha,
                          image_path=self.loginImage,
@@ -235,7 +234,7 @@ class Janela:
 
         if self.animlogin == 660:
              
-            self.loginCanva = CTkImage(light_image=Image.open("icons\personagem.png"),dark_image=Image.open("icons\personagem.png"),size=(120,120))
+            self.loginCanva = CTkImage(light_image=Image.open("./icons/personagem.png"),dark_image=Image.open("./icons/personagem.png"),size=(120,120))
             self.lbLogCanva = CTkLabel(master=self.frameLogin,
                                        image=self.loginCanva,
                                        text=None,
@@ -245,7 +244,7 @@ class Janela:
         
         
             
-            self.loginCanvalado = CTkImage(light_image=Image.open("icons\imgfundo_login2.png"),dark_image=Image.open("icons\imgfundo_login2.png"),size=(250,320))
+            self.loginCanvalado = CTkImage(light_image=Image.open("./icons/imgfundo_login2.png"),dark_image=Image.open("./icons/imgfundo_login2.png"),size=(250,320))
             self.lbLogCanvalado = CTkLabel(master=self.frameLogin,
                                        image=self.loginCanvalado,
                                        text=None,
@@ -293,14 +292,14 @@ class Janela:
             
         if self.animcadastro ==660:
             
-            self.loginCanva = CTkImage(light_image=Image.open("icons\personagemcads.png"),dark_image=Image.open("icons\personagemcads.png"),size=(150,100))
+            self.loginCanva = CTkImage(light_image=Image.open("./icons/personagemcads.png"),dark_image=Image.open("./icons/personagemcads.png"),size=(150,100))
             self.lbLogCanva = CTkLabel(master=self.frameCadastro,
                                        image=self.loginCanva,
                                        text=None,
                                        bg_color="#1A1926",fg_color="transparent")
             self.lbLogCanva.place(x=45,y=60)
             
-            self.cadCanvalado = CTkImage(light_image=Image.open("icons\imgfundo_cadastro.png"),dark_image=Image.open("icons\imgfundo_cadastro.png"),size=(250,320))
+            self.cadCanvalado = CTkImage(light_image=Image.open("./icons/imgfundo_cadastro.png"),dark_image=Image.open("./icons/imgfundo_cadastro.png"),size=(250,320))
             self.lbcadCanvalado = CTkLabel(master=self.frameCadastro,
                                        image=self.cadCanvalado,
                                        text=None,
