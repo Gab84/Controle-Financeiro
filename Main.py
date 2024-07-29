@@ -118,12 +118,17 @@ class Janela:
         else:
             print("A coluna 'Tipo (Receita/Despesa)' não foi encontrada no DataFrame.")
         
+        # Converta as colunas "Dia", "Mês" e "Ano" para string antes de ordenar
+        for col in ["Dia", "Mês", "Ano"]:
+            if col in filtered_df.columns:
+                filtered_df[col] = filtered_df[col].astype(str)
+
         if hasattr(self, 'sort_by'):
-            if self.sort_by == "Dia":
+            if self.sort_by == "Dia" and "Dia" in filtered_df.columns:
                 filtered_df = filtered_df.sort_values(by="Dia", ascending=self.sort_order["Dia"])
-            elif self.sort_by == "Mês":
+            elif self.sort_by == "Mês" and "Mês" in filtered_df.columns:
                 filtered_df = filtered_df.sort_values(by="Mês", ascending=self.sort_order["Mês"])
-            elif self.sort_by == "Ano":
+            elif self.sort_by == "Ano" and "Ano" in filtered_df.columns:
                 filtered_df = filtered_df.sort_values(by="Ano", ascending=self.sort_order["Ano"])
 
         for row in filtered_df.to_numpy().tolist():
@@ -249,10 +254,12 @@ class Janela:
         self.barra.set(porcentagem)
     
     #enviar cadastro
+      #enviar cadastro
+    # enviar cadastro
     def enviarCadastro(self):
         
-        #tratamento de erro 
-        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2 or len(self.dataDiaGet.get()) <1 or  self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
+        # tratamento de erro 
+        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) > 2 or len(self.dataDiaGet.get()) < 1 or self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
             def fechar_erro():
                 erro_toplevel.destroy()
             # Cria a janela pop-up
@@ -275,27 +282,30 @@ class Janela:
             botao_fechar.pack(pady=10)
             return
         
-        
-        #coleta dos dados
+        # coleta dos dados
         self.descricaoRegistro = self.descricaoRegistroGet.get()
         self.valorRegistro = float(self.valorRegistroGet.get().replace(',', '.'))
-        self.dataDia = float(self.dataDiaGet.get())
+        self.dataDia = int(self.dataDiaGet.get())
         self.dataMes = self.dataMesGet.get()
-        self.dataAno = float(self.dataAnoGet.get())
+        self.dataAno = int(self.dataAnoGet.get())
         self.tipoEntrada = self.tipoEntradaGet.get()
         self.categoriaEntrada = self.categoriaEntradaGet.get()
         self.barradeuso()
         
-        
-        # inserindo os dados
-        
+        # carregando a planilha e verificando a última linha com dados
         planilha = openpyxl.load_workbook(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx")
         planilhaaberta = planilha.active
-        planilhaaberta.append([self.dataDia,self.dataMes,self.dataAno,self.descricaoRegistro,self.categoriaEntrada,self.valorRegistro,self.tipoEntrada])
+        
+        # Encontrar a próxima linha disponível
+        proxima_linha = planilhaaberta.max_row + 1
+        
+        # Inserindo os dados na próxima linha disponível
+        planilhaaberta.append([self.dataDia, self.dataMes, self.dataAno, self.descricaoRegistro, self.categoriaEntrada, self.valorRegistro, self.tipoEntrada])
         planilha.save(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx")
         
+        # Atualiza a página de cadastro para refletir a nova inserção
         self.cadastropage()
-        
+
         
         
     
