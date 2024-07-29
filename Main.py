@@ -252,7 +252,7 @@ class Janela:
     def enviarCadastro(self):
         
         #tratamento de erro 
-        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2 or len(self.dataDiaGet.get()) <1 or self.dataAnoGet.get()>31 or  self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
+        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2 or len(self.dataDiaGet.get()) <1 or  self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
             def fechar_erro():
                 erro_toplevel.destroy()
             # Cria a janela pop-up
