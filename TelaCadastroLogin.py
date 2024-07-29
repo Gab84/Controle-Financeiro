@@ -84,6 +84,12 @@ class Janela:
         ws["J1"] = "Saldo"
         # Fórmula para calcular o saldo conforme "Entrada" e "Saída"
         ws["J2"] = "=I2 + SUMIF(G2:G100000, \"Entrada\", F2:F100000) - SUMIF(G2:G100000, \"Saida\", F2:F100000)"
+            
+        ws["A2"] = 0.0
+        ws["C2"] = 0.0
+        
+        
+        
         # Salva o arquivo
         wb.save(f"./planilha_anotacoes/{self.nusuariox}_controle_financeiro.xlsx")
 

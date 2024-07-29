@@ -2,6 +2,8 @@ from customtkinter import *
 from PIL import Image, ImageTk
 
 import openpyxl
+from tkinter import ttk
+import pandas as pd
 
 
 #cores
@@ -19,7 +21,8 @@ class Janela:
         self.username = username
         self.salario = salario
         self.homepage()
-          
+        self.barradeuso()
+        
     def run(self):
         self.janela.mainloop()
     
@@ -48,9 +51,83 @@ class Janela:
         self.saldo = self.salario + receita - despesa
         self.saldoEntradas = receita
         self.saldoSaidas = despesa
+    
+    
+
+    
+    
+    def get_column_widths(self):
+        column_widths = {}
+        for i, column in enumerate(self.df.columns):
+            if i == 6:  # Verifica se é a coluna 7 (índice 6)
+                column_widths[column] = 100  # Define uma largura maior
+            if i == 5:  # Verifica se é a coluna 7 (índice 6)
+                column_widths[column] = 50  # Define uma largura maior
+                
+            else:
+                column_widths[column] = 50
+        return column_widths
+    
+    def apply_filter(self, filter_type):
+        self.filter_var.set(filter_type)
+        self.update_table()
+
+    def initialize_table(self):
+        self.tree["column"] = list(self.df.columns)
+        
+        for column in self.tree["column"]:
+            self.tree.heading(column, text=column)
+            self.tree.column(column, minwidth=50, width=self.column_widths[column], stretch=True)
+        
+        self.update_table()
+
+        
+    def apply_sort(self, sort_type):
+        self.sort_order[sort_type] = not self.sort_order[sort_type]
+        self.sort_by = sort_type
+        self.update_table()   
+        
+    def on_treeview_click(self, event):
+        region = self.tree.identify("region", event.x, event.y)
+        if region == "heading":
+            column = self.tree.identify_column(event.x)
+            column_name = self.tree.column(column, option="id")
+            if column_name in self.sort_order:
+                self.apply_sort(column_name)
+                  
+
+    def load_excel(self):
+        # Carregar o Excel e inverter a ordem das linhas
+        self.df = pd.read_excel(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx").fillna("")
+        self.df = self.df.iloc[::-1]  # Inverte a ordem das linhas
+        self.df = self.df.iloc[:, :7]  # Seleciona apenas as colunas A a G (primeiras 7 colunas)
 
 
+    def update_table(self):
+        self.load_excel()
+        self.tree.delete(*self.tree.get_children())
+        
+        filtered_df = self.df
+        filter_type = self.filter_var.get()
+        
+        if "Tipo (Receita/Despesa)" in self.df.columns:
+            if filter_type == "Entradas":
+                filtered_df = self.df[self.df["Tipo (Receita/Despesa)"] == "Entrada"]
+            elif filter_type == "Saidas":
+                filtered_df = self.df[self.df["Tipo (Receita/Despesa)"] == "Saida"]
+        else:
+            print("A coluna 'Tipo (Receita/Despesa)' não foi encontrada no DataFrame.")
+        
+        if hasattr(self, 'sort_by'):
+            if self.sort_by == "Dia":
+                filtered_df = filtered_df.sort_values(by="Dia", ascending=self.sort_order["Dia"])
+            elif self.sort_by == "Mês":
+                filtered_df = filtered_df.sort_values(by="Mês", ascending=self.sort_order["Mês"])
+            elif self.sort_by == "Ano":
+                filtered_df = filtered_df.sort_values(by="Ano", ascending=self.sort_order["Ano"])
 
+        for row in filtered_df.to_numpy().tolist():
+            self.tree.insert("", "end", values=row)
 
         
     def homepage(self):
@@ -58,6 +135,56 @@ class Janela:
         self.obter_saldo()
         self.janela.geometry("1024x720")
         self.janela.configure(fg_color=fundo)
+        
+        
+        #frame central---------------------
+        self.posxframecentral = 280
+        
+        self.framecentro = CTkFrame(master=self.janela,width=710,height=460,fg_color=fundo_cima,corner_radius=30)
+        self.framecentro.place(x=self.posxframecentral,y=160)
+        
+
+        # Configuração do estilo do ttk para combinar com CustomTkinter
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Custom.Treeview",
+                        background="#D3D3D3",
+                        foreground="black",
+                        rowheight=25,
+                        fieldbackground="#D3D3D3")
+        
+        style.configure("Custom.Treeview.Heading",
+                background="#4D4D4D",
+                foreground="white",
+                font=("Helvetica", 10, "bold"))
+        
+        style.map('Custom.Treeview',
+                  background=[('selected', '#347083')],
+                  foreground=[('selected', 'white')])
+
+        # Criação do Treeview
+        self.tree = ttk.Treeview(self.framecentro, show="headings", height=5)
+        self.tree.place(x=30,y=280)
+        
+        self.tree.bind("<Button-1>", self.on_treeview_click)
+        
+        self.filter_var = StringVar(value="Todos")
+        self.sort_order = {"Dia": False, "Mês": False, "Ano": False}
+        
+        self.load_excel()
+        self.column_widths = self.get_column_widths()
+        self.initialize_table()
+        
+        
+        self.all_button = CTkButton(self.framecentro, text="Todos", command=lambda: self.apply_filter("Todos"),width=40)
+        self.all_button.place(x=30,y=420)
+        
+        self.entries_button = CTkButton(self.framecentro, text="Entradas", command=lambda: self.apply_filter("Entradas"),width=40)
+        self.entries_button.place(x=90,y=420)
+        
+        self.exits_button = CTkButton(self.framecentro, text="Saídas", command=lambda: self.apply_filter("Saidas"),width=40)
+        self.exits_button.place(x=170,y=420)
+        
         
         
         
@@ -92,11 +219,7 @@ class Janela:
         
         
         
-        #frame central---------------------
-        self.posxframecentral = 280
-        
-        self.framecentro = CTkFrame(master=self.janela,width=710,height=460,fg_color=fundo_cima,corner_radius=30)
-        self.framecentro.place(x=self.posxframecentral,y=160)
+
         
         
         CTkLabel(master=self.framecentro,text=self.saldo,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=100)
@@ -106,16 +229,30 @@ class Janela:
         CTkButton(master=self.janela,height=60,corner_radius=30,text="Sair",command=self.janela.destroy).place(x=840,y=640)
         
         
+
+        
+        
         #decoração frame central
         self.planeta = CTkImage(light_image=Image.open("./imgassets/decor/planeta.png"),dark_image=Image.open("./imgassets/decor/planeta.png"),size=(70,40))
         self.planetalabel = CTkLabel(master=self.janela,image=self.planeta,text=None)
         self.planetalabel.place(x=946,y=27)
+        self.barradeuso()
     
+    def barradeuso(self):
+        
+        self.barra = CTkProgressBar(master=self.janela,height=30,corner_radius=0)
+        self.barra.place(x=280,y=120)
+        
+        saldo = self.salario + self.saldoEntradas
+        saidas = (self.saldoSaidas*100)
+        porcentagem = (saidas/saldo)/100
+        self.barra.set(porcentagem)
     
     #enviar cadastro
     def enviarCadastro(self):
+        
         #tratamento de erro 
-        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2:
+        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2 or len(self.dataDiaGet.get()) <1 or self.dataAnoGet.get()>31 or  self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
             def fechar_erro():
                 erro_toplevel.destroy()
             # Cria a janela pop-up
@@ -130,7 +267,7 @@ class Janela:
             erro_toplevel.grab_set()
 
             # Adiciona uma etiqueta com a mensagem de erro
-            label = CTkLabel(master=erro_toplevel, text="Data ou Tipo de Registro incorretos", text_color="red", font=("Arial", 14))
+            label = CTkLabel(master=erro_toplevel, text="Preencha todos os campos corretamente.", text_color="red", font=("Arial", 14))
             label.pack(pady=20)
 
             # Adiciona um botão para fechar o pop-up
@@ -142,11 +279,12 @@ class Janela:
         #coleta dos dados
         self.descricaoRegistro = self.descricaoRegistroGet.get()
         self.valorRegistro = float(self.valorRegistroGet.get().replace(',', '.'))
-        self.dataDia = self.dataDiaGet.get()
+        self.dataDia = float(self.dataDiaGet.get())
         self.dataMes = self.dataMesGet.get()
-        self.dataAno = self.dataAnoGet.get()
+        self.dataAno = float(self.dataAnoGet.get())
         self.tipoEntrada = self.tipoEntradaGet.get()
         self.categoriaEntrada = self.categoriaEntradaGet.get()
+        self.barradeuso()
         
         
         # inserindo os dados
@@ -159,8 +297,10 @@ class Janela:
         self.cadastropage()
         
         
+        
     
     def cadastropage(self):
+        
         print("cadastro")
         #frame central cadastro
         self.framecentro = CTkFrame(master=self.janela,width=710,height=460,fg_color=fundo_cima,corner_radius=30)
@@ -192,7 +332,7 @@ class Janela:
         self.categoriaEntradaGet.place(x=300,y=220)   
         self.categoriaEntradaGet.set("Categoria") 
         CTkButton(master=self.framecentro,command=self.enviarCadastro).place(x=500,y=300)
-            
+        
         pass
     def entradaspage(self):
         pass
@@ -229,7 +369,7 @@ class Janela:
         
         
         
-        
-win = Janela("gabs",125000)
+      
+# win = Janela("gabs",125000)
 
-win.run()
+# win.run()
