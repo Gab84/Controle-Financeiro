@@ -5,6 +5,27 @@ import openpyxl
 from tkinter import ttk
 import pandas as pd
 
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
+import platform
+
+fontehome = ("Impact",25)
+fontesalario = ("Impact",15)
+
+
+def check_os():
+    os_name = platform.system()
+    if os_name == "Windows":
+        fontehome = ("Impact",25)
+        fontesalario = ("Impact",15)
+    elif os_name == "Linux":
+        fontehome = ("Arial",25)
+        fontesalario = ("Arial",15)
+    else:
+        print(f"Estou usando {os_name}")
+
 
 #cores
 fundo = "#4D3D14"
@@ -15,11 +36,14 @@ fundo_cima_utils= "#A28F61"
 
 
 
+
+
 class Janela:
     def __init__(self,username,salario) -> None:
         self.janela = CTk()
         self.username = username
         self.salario = salario
+        check_os()
         self.homepage()
         self.barradeuso()
         
@@ -118,17 +142,12 @@ class Janela:
         else:
             print("A coluna 'Tipo (Receita/Despesa)' não foi encontrada no DataFrame.")
         
-        # Converta as colunas "Dia", "Mês" e "Ano" para string antes de ordenar
-        for col in ["Dia", "Mês", "Ano"]:
-            if col in filtered_df.columns:
-                filtered_df[col] = filtered_df[col].astype(str)
-
         if hasattr(self, 'sort_by'):
-            if self.sort_by == "Dia" and "Dia" in filtered_df.columns:
+            if self.sort_by == "Dia":
                 filtered_df = filtered_df.sort_values(by="Dia", ascending=self.sort_order["Dia"])
-            elif self.sort_by == "Mês" and "Mês" in filtered_df.columns:
+            elif self.sort_by == "Mês":
                 filtered_df = filtered_df.sort_values(by="Mês", ascending=self.sort_order["Mês"])
-            elif self.sort_by == "Ano" and "Ano" in filtered_df.columns:
+            elif self.sort_by == "Ano":
                 filtered_df = filtered_df.sort_values(by="Ano", ascending=self.sort_order["Ano"])
 
         for row in filtered_df.to_numpy().tolist():
@@ -203,33 +222,42 @@ class Janela:
         
         #textos Dinamicos Img user
         
-        CTkLabel(master=self.imguserLabel,text=f"{self.username} ".upper(),text_color="black",font=("Impact",20),fg_color=fundo_cima_utils,bg_color="transparent").place(x=87,y=20)
-        CTkLabel(master=self.imguserLabel,text=f"R${self.salario}  ".upper(),text_color="white",font=("Impact",15),fg_color=fundo_cima_utils,bg_color="transparent").place(x=90,y=55)
+        CTkLabel(master=self.imguserLabel,text=f"{self.username} ".upper(),text_color="black",font=fontehome,fg_color=fundo_cima_utils,bg_color="transparent").place(x=87,y=20)
+        CTkLabel(master=self.imguserLabel,text=f"R${self.salario}  ".upper(),text_color="white",font=fontesalario,fg_color=fundo_cima_utils,bg_color="transparent").place(x=90,y=55)
         
         
         #Botões esquerda
         
-        self.btnhome = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="Inicial".upper(),font=("Impact",20),command=self.homepage)
+        self.btnhome = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="Inicial".upper(),font=fontehome,command=self.homepage)
         self.btnhome.place(x=35,y=135)
-        self.btncadastro = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="cadastro".upper(),font=("Impact",20),command=self.cadastropage)
+        self.btncadastro = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="cadastro".upper(),font=fontehome,command=self.cadastropage)
         self.btncadastro.place(x=35,y=215)
-        self.btnentradas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="entradas".upper(),font=("Impact",20),command=self.entradaspage)
+        self.btnentradas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="entradas".upper(),font=fontehome,command=self.entradaspage)
         self.btnentradas.place(x=35,y=295) 
-        self.btnsaidas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="saidas".upper(),font=("Impact",20),command=self.saidaspage)
+        self.btnsaidas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="saidas".upper(),font=fontehome,command=self.saidaspage)
         self.btnsaidas.place(x=35,y=375) 
-        self.btntodas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="todos".upper(),font=("Impact",20),command=self.todospage)
+        self.btntodas = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="todos".upper(),font=fontehome,command=self.todospage)
         self.btntodas.place(x=35,y=455) 
-        self.btneditar = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="dados".upper(),font=("Impact",20),command=self.dadospage)
+        self.btneditar = CTkButton(master=self.frameEsquerda,height=70,width=150,corner_radius=30,text="dados".upper(),font=fontehome,command=self.dadospage)
         self.btneditar.place(x=35,y=535) 
         
         
         
 
         
+        #mudando isso aqui tbm ............   mudar
         
-        CTkLabel(master=self.framecentro,text=self.saldo,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=100)
-        CTkLabel(master=self.framecentro,text=self.saldoEntradas,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=150)
-        CTkLabel(master=self.framecentro,text=self.saldoSaidas,text_color="black",font=("Impact",25),fg_color=fundo_cima,bg_color=fundo_cima).place(x=50,y=200)
+        CTkLabel(master=self.janela,text=f"Seu saldo atual: R${self.saldo} ",text_color="white",font=fontehome,fg_color=fundo,bg_color=fundo).place(x=280,y=80)
+        CTkLabel(master=self.janela,text=f"Dinhiro adicionado: R${self.saldoEntradas} ",text_color="green",font=fontehome,fg_color=fundo,bg_color=fundo).place(x=670,y=80)
+        CTkLabel(master=self.janela,text=f"Dinheiro Gasto: R${self.saldoSaidas} ",text_color="red",font=fontehome,fg_color=fundo,bg_color=fundo).place(x=670,y=120)
+        CTkLabel(master=self.janela,text=f"Barra de uso ",text_color="white",font=("Arial",20,"italic"),fg_color=fundo,bg_color=fundo).place(x=490,y=120)
+        
+        
+        
+        
+        
+        
+        ###
         
         CTkButton(master=self.janela,height=60,corner_radius=30,text="Sair",command=self.janela.destroy).place(x=840,y=640)
         
@@ -242,6 +270,86 @@ class Janela:
         self.planetalabel = CTkLabel(master=self.janela,image=self.planeta,text=None)
         self.planetalabel.place(x=946,y=27)
         self.barradeuso()
+        
+        
+        
+        
+        #parte dos graficos passa para o main  ------ mudar
+        
+      
+
+        entries_sum = self.df[self.df["Tipo (Receita/Despesa)"] == "Entrada"]["Valor"].sum()
+        exits_sum = self.df[self.df["Tipo (Receita/Despesa)"] == "Saida"]["Valor"].sum()
+        balance = entries_sum - exits_sum + self.salario
+        
+        # Garantir que todos os valores sejam não negativos
+        entries_sum = max(entries_sum, 0)
+        exits_sum = max(exits_sum, 0)
+        balance = max(balance, 0)
+        
+        data = {"Entradas": entries_sum, "Saidas": exits_sum, "Saldo": balance}
+        names = list(data.keys())
+        values = list(data.values())
+        
+        fig = Figure(figsize=(5,2))  # Tamanho do gráfico de barras
+        fig.patch.set_facecolor(fundo_cima)
+        ax = fig.add_subplot(111)
+        ax.bar(names, values, color=["#4CAF50", "#F44336", "#FFC107"])  # Cores dos bastões
+        ax.set_title("Entradas, Saídas e Saldo")  # Título do gráfico
+        
+        
+        
+        canvas = FigureCanvasTkAgg(fig, master=self.framecentro)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=32,y=20)
+        
+        
+        
+        # Categorias a serem mostradas no gráfico de pizza
+        categories = ["Lazer", "Contas", "Saúde", "Comidas","Outros"]
+        
+        # Verifica se a coluna 'Categoria' e 'Valor' existem no DataFrame
+        if "Categoria" not in self.df.columns or "Valor" not in self.df.columns:
+            print("As colunas 'Categoria' e/ou 'Valor' não foram encontradas no DataFrame.")
+            return
+        
+        # Calcula a soma dos valores para cada categoria
+        data = self.df[self.df["Categoria"].isin(categories)].groupby("Categoria")["Valor"].sum()
+        
+        # Garantir que todos os valores sejam não negativos
+        data = data.clip(lower=0)
+        
+        labels = data.index.tolist()
+        values = data.tolist()
+        colors = ["#4CAF50", "#FFC107", "#FF5722", "#03A9F4", "#E91E63"]  # Cores das fatias
+
+        fig = Figure(figsize=(2.5,2))  # Tamanho do gráfico de pizza
+        fig.patch.set_facecolor(fundo_cima)
+        ax = fig.add_subplot(111)
+        ax.pie(values, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)  # Configuração do gráfico de pizza
+        ax.set_title("Distribuição Financeira")  # Título do gráfico
+        
+        canvas = FigureCanvasTkAgg(fig, master=self.framecentro)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=430,y=250)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        # from matplotlib.figure import Figure
+        # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        
+        
+        #fim dos graficos 
+        
+        
+        
+        
     
     def barradeuso(self):
         
@@ -254,12 +362,10 @@ class Janela:
         self.barra.set(porcentagem)
     
     #enviar cadastro
-      #enviar cadastro
-    # enviar cadastro
     def enviarCadastro(self):
         
-        # tratamento de erro 
-        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) > 2 or len(self.dataDiaGet.get()) < 1 or self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
+        #tratamento de erro 
+        if self.tipoEntradaGet.get() == "Tipo de Registro" or len(self.dataDiaGet.get()) >2 or len(self.dataDiaGet.get()) <1 or  self.dataMesGet.get() == "Mês" or self.dataAnoGet.get() == "Ano":
             def fechar_erro():
                 erro_toplevel.destroy()
             # Cria a janela pop-up
@@ -282,30 +388,35 @@ class Janela:
             botao_fechar.pack(pady=10)
             return
         
-        # coleta dos dados
+        
+        #coleta dos dados
         self.descricaoRegistro = self.descricaoRegistroGet.get()
         self.valorRegistro = float(self.valorRegistroGet.get().replace(',', '.'))
-        self.dataDia = int(self.dataDiaGet.get())
+        self.dataDia = float(self.dataDiaGet.get())
         self.dataMes = self.dataMesGet.get()
-        self.dataAno = int(self.dataAnoGet.get())
+        self.dataAno = float(self.dataAnoGet.get())
         self.tipoEntrada = self.tipoEntradaGet.get()
         self.categoriaEntrada = self.categoriaEntradaGet.get()
+        
+         # mudar
+        if self.categoriaEntrada == "Categoria":
+            self.categoriaEntrada = "Outros"
+        
+        
+        ##
+        
         self.barradeuso()
         
-        # carregando a planilha e verificando a última linha com dados
+        
+        # inserindo os dados
+        
         planilha = openpyxl.load_workbook(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx")
         planilhaaberta = planilha.active
-        
-        # Encontrar a próxima linha disponível
-        proxima_linha = planilhaaberta.max_row + 1
-        
-        # Inserindo os dados na próxima linha disponível
-        planilhaaberta.append([self.dataDia, self.dataMes, self.dataAno, self.descricaoRegistro, self.categoriaEntrada, self.valorRegistro, self.tipoEntrada])
+        planilhaaberta.append([self.dataDia,self.dataMes,self.dataAno,self.descricaoRegistro,self.categoriaEntrada,self.valorRegistro,self.tipoEntrada])
         planilha.save(f"./planilha_anotacoes/{self.username}_controle_financeiro.xlsx")
         
-        # Atualiza a página de cadastro para refletir a nova inserção
         self.cadastropage()
-
+        
         
         
     
@@ -380,6 +491,6 @@ class Janela:
         
         
       
-# win = Janela("gabs",125000)
+win = Janela("gabs",125000)
 
-# win.run()
+win.run()
