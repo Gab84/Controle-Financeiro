@@ -4,3 +4,4 @@ pillow
 xlwings
 pandas
 tkinter
+matplotlib
